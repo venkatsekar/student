@@ -1,0 +1,15 @@
+
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+ 
+RewriteCond %{REQUEST_FILENAME} !-f
+
+RewriteRule ^(.*)$ index.php?url=$1 [NC,QSA,L]
+
+php_value short_open_tag 1
+php_flag display_errors 1
+php_value memory_limit 128M
+
+</IfModule>
