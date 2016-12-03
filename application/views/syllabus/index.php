@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>EDUCATION | SYLLABUS</title>
+    <title>STUDENT | STUDENT</title>
 
     <link href="<?=BASEURL;?>public/assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="<?=BASEURL;?>public/assets/font-awesome/css/font-awesome.css" rel="stylesheet">
@@ -14,12 +14,12 @@
     <link href="<?=BASEURL;?>public/assets/css/plugins/steps/jquery.steps.css" rel="stylesheet">
     <link href="<?=BASEURL;?>public/assets/css/animate.css" rel="stylesheet">
     <link href="<?=BASEURL;?>public/assets/css/style.css" rel="stylesheet">
-	<link href="<?=BASEURL;?>public/assets/css/plugins/datapicker/datepicker3.css" rel="stylesheet">
-
-
+    <link href="<?=BASEURL;?>public/assets/css/plugins/datapicker/datepicker3.css" rel="stylesheet">
+      <link href="<?=BASEURL;?>public/assets/css/plugins/dataTables/datatables.min.css" rel="stylesheet">
+      <link href="<?=BASEURL;?>public/assets/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
     <style>
 
-        .wizard > .content > .body { position: relative; }
+        .wizard > .content > .body  {position: relative; }
 
     </style>
 
@@ -49,10 +49,13 @@
                     <a href="<?=BASEURL;?>studentclass"><i class="fa fa-calculator"></i> <span class="nav-label">Class</span></a>
                 </li>
                 <li>
-                    <a href="<?=BASEURL;?>syllabus"><i class="fa fa-diamond"></i> <span class="nav-label">Syllabus</span></a>
+                    <a href="<?=BASEURL;?>role"><i class="fa fa-wifi"></i> <span class="nav-label">Role</span></a>
                 </li>
                 <li>
-                    <a href="<?=BASEURL;?>role"><i class="fa fa-wifi"></i> <span class="nav-label">Role</span></a>
+                    <a href="<?=BASEURL;?>preparation"><i class="fa fa-clipboard"></i> <span class="nav-label">Preparation</span></a>
+                </li>
+                <li>
+                    <a href="<?=BASEURL;?>settings"><i class="fa fa-user-md"></i> <span class="nav-label">Settings</span></a>
                 </li>
             </ul>
 
@@ -61,51 +64,45 @@
 
         <div id="page-wrapper" class="gray-bg">
         <div class="row border-bottom">
-        <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0;height: 66px;">
-			<ul class="nav navbar-top-links navbar-right">
-               
-            </ul>
-
-        </nav>
+         <?php
+            load_view("common/header" , array("name" => $name));
+        ?>
         </div>
             <div class="row wrapper border-bottom white-bg page-heading">
                 <div class="col-lg-10">
                     <h2>Syllabus</h2>
                 </div>
                 <div class="col-lg-2">
-
+                 <h2><a class="btn btn-info" href="<?=BASEURL?>syllabus/add">Add Syllabus</a></h2>  
                 </div>
             </div>
-        <div class="wrapper wrapper-content  animated fadeInRight">
+        <div class="wrapper wrapper-content animated fadeInRight">
             <div class="row">
                 <div class="col-lg-12">
-                    <div class="ibox ">
+                    <div class="ibox">
                         <div class="ibox-title">
-                            <h5>Syllabus Details</h5>
+                            <h5>Syllabus</h5>
                         </div>
                         <div class="ibox-content">
-                            <form role="form" id="form">
-                                    <div class="form-group">
-                                        <label>Name</label>
-                                        <input type="text" placeholder="Enter email" class="form-control" name="boardName" id="boardName">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Description</label> 
-                                        <textarea class="form-control" name="boardDesc" id="boardDesc"></textarea>
-                                    </div>
-                                    <div align="center">
-                                        <a class="btn btn-md btn-white m-t-n-xs" href="#">Cancel</a>
-                                        <input class="btn btn-md btn-primary m-t-n-xs" type="submit" id="submit" value="Save">
-                                    </div>
-                                </form>
-                        </div>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-bordered table-hover dataTables-example" id="table" >
+                                <thead>
+                                <tr>
+                                    <th>Lesson Name</th>
+                                    <th>Subject</th>
+                                    <th>Action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                
+                                </table>
+                            </div>
                     </div>
-
+                    </div>
+                    </div>
 
                 </div>
             </div>
-
-        </div>
       
 
         </div>
@@ -113,14 +110,14 @@
 
 
 
-    <!-- Mainly scripts -->
+     <!-- Mainly scripts -->
     <script src="<?=BASEURL;?>public/assets/js/jquery-2.1.1.js"></script>
     <script src="<?=BASEURL;?>public/assets/js/bootstrap.min.js"></script>
     <script src="<?=BASEURL;?>public/assets/js/plugins/metisMenu/jquery.metisMenu.js"></script>
     <script src="<?=BASEURL;?>public/assets/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
 
-    <!-- Custom and plugin javascript -->
-    <!--<script src="<?=BASEURL;?>public/assets/js/inspinia.js"></script>-->
+    <!-- Custom and plugin javascript --
+    <script src="<?=BASEURL;?>public/assets/js/inspinia.js"></script>-->
     <script src="<?=BASEURL;?>public/assets/js/plugins/pace/pace.min.js"></script>
 
     <!-- Steps -->
@@ -128,39 +125,52 @@
 
     <!-- Jquery Validate -->
     <script src="<?=BASEURL;?>public/assets/js/plugins/validate/jquery.validate.min.js"></script>
-	<!-- Data picker -->
-	<script src="<?=BASEURL;?>public/assets/js/plugins/datapicker/bootstrap-datepicker.js"></script>
-	 <script>
-         $(document).ready(function(){
+    <!-- Data picker -->
+    <script src="<?=BASEURL;?>public/assets/js/plugins/datapicker/bootstrap-datepicker.js"></script>
+    <script src="<?=BASEURL;?>public/assets/js/plugins/dataTables/datatables.min.js"></script>
+    <script src="<?=BASEURL;?>public/assets/js/plugins/sweetalert/sweetalert.min.js"></script>
+    <script>
+    $(document).ready(function(){
+           $('.dataTables-example').DataTable({
+               "processing": true,
+                "serverSide": true,
+                "ajax": "<?=BASEURL?>syllabus/list_syllabus/"
 
-             $("#form").validate({
-                 rules: {
-                     password: {
-                         required: true,
-                         minlength: 3
-                     },
-                     url: {
-                         required: true,
-                         url: true
-                     },
-                     number: {
-                         required: true,
-                         number: true
-                     },
-                     min: {
-                         required: true,
-                         minlength: 6
-                     },
-                     max: {
-                         required: true,
-                         maxlength: 4
-                     }
-                 }
-             });
+            });
+
+
         });
+    
+function delete_syllabus(syllabusId) {
+    swal({
+        title: "Are you sure?",
+        text: "You will not be able to recover this imaginary file!",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "Yes, delete it!",
+        closeOnConfirm: false
+    }, function (isConfirm) {
+        if (!isConfirm) return;
+        $.ajax({
+            url: "<?=BASEURL?>syllabus/delete_syllabus",
+            type: "POST",
+            data: {
+                syllabusId: syllabusId
+            },
+            success: function () {
+                swal("Done!", "It was succesfully deleted!", "success");
+                 var table1 = $('.dataTables-example').DataTable();
+                               table1.ajax.reload(); 
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                swal("Error deleting!", "Please try again", "error");
+            }
+        });
+    });
+}
     </script>
-
-   
+        
 
 </body>
 

@@ -1,6 +1,6 @@
 <?php
 
-class StudentClass extends Model {
+class Studentclass extends Model {
 		
 	//List Class
 	function list_class()

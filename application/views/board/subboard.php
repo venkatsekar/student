@@ -15,8 +15,8 @@
     <link href="<?=BASEURL;?>public/assets/css/animate.css" rel="stylesheet">
     <link href="<?=BASEURL;?>public/assets/css/style.css" rel="stylesheet">
     <link href="<?=BASEURL;?>public/assets/css/plugins/datapicker/datepicker3.css" rel="stylesheet">
-      <link href="<?=BASEURL;?>public/assets/css/plugins/dataTables/datatables.min.css" rel="stylesheet">
-
+    <link href="<?=BASEURL;?>public/assets/css/plugins/dataTables/datatables.min.css" rel="stylesheet">
+    <link href="<?=BASEURL;?>public/assets/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
     <style>
 
         .wizard > .content > .body { position: relative; }
@@ -49,10 +49,13 @@
                     <a href="<?=BASEURL;?>studentclass"><i class="fa fa-calculator"></i> <span class="nav-label">Class</span></a>
                 </li>
                 <li>
-                    <a href="<?=BASEURL;?>syllabus"><i class="fa fa-diamond"></i> <span class="nav-label">Syllabus</span></a>
+                    <a href="<?=BASEURL;?>role"><i class="fa fa-wifi"></i> <span class="nav-label">Role</span></a>
                 </li>
                 <li>
-                    <a href="<?=BASEURL;?>role"><i class="fa fa-wifi"></i> <span class="nav-label">Role</span></a>
+                    <a href="<?=BASEURL;?>preparation"><i class="fa fa-clipboard"></i> <span class="nav-label">Preparation</span></a>
+                </li>
+                <li>
+                    <a href="<?=BASEURL;?>settings"><i class="fa fa-user-md"></i> <span class="nav-label">Settings</span></a>
                 </li>
             </ul>
 
@@ -61,12 +64,9 @@
 
         <div id="page-wrapper" class="gray-bg">
         <div class="row border-bottom">
-        <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0;height: 66px;">
-            <ul class="nav navbar-top-links navbar-right">
-               
-            </ul>
-
-        </nav>
+        <?php
+            load_view("common/header" , array("name" => $name));
+        ?>
         </div>
             <div class="row wrapper border-bottom white-bg page-heading">
                 <div class="col-lg-10">
@@ -154,7 +154,8 @@
     <!-- Data picker -->
     <script src="<?=BASEURL;?>public/assets/js/plugins/datapicker/bootstrap-datepicker.js"></script>
     <script src="<?=BASEURL;?>public/assets/js/plugins/dataTables/datatables.min.js"></script>
-     <script>
+     <script src="<?=BASEURL;?>public/assets/js/plugins/sweetalert/sweetalert.min.js"></script>
+    <script>
          $(document).ready(function(){
 
              $("#form").validate({
@@ -171,9 +172,22 @@
                  url: "<?=BASEURL?>board/add_subboard",
                  data: $(form).serialize(),
                  success: function (data) {
-
-                    $('#message').html('<div class="alert alert-success alert-dismissable"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>'+data+'<a class="alert-link" href="#">Alert Link</a>.</div>');
-                    //location.reload();
+                    if(data == 'add')
+                    {
+                    swal({
+                      title: "Added successfully",
+                      type: "success",
+                      confirmButtonText: "OK"
+                    });
+                    }
+                     if(data == 'edit')
+                    {
+                      swal({
+                      title: "Updated successfully",
+                      type: "success",
+                      confirmButtonText: "OK"
+                    });  
+                    }
                     $("#table").load(location.href + " #table");
                     $("#form")[0].reset();
                 }
@@ -209,26 +223,37 @@
             });
 
         });
+
 function deleteboard(subBoardId,schboardId)
 {
-var schboardId = schboardId;
-var subBoardId = subBoardId
-if(confirm("Are you sure you want to delete this?"))
-{
- $.ajax({
-   type: "POST",
-   url: "<?=BASEURL?>board/delete_sub_board",
-   data: {schboardId : schboardId, subBoardId:subBoardId },
-   success: function(data){
-    $('#message').html('<div class="alert alert-success alert-dismissable"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>'+data+'<a class="alert-link" href="#">Alert Link</a>.</div>');
-                    //location.reload();
-                    $("#table").load(location.href + " #table");
- }
-});
-  $(this).parents(".show").animate({ backgroundColor: "#003" }, "slow")
-  .animate({ opacity: "hide" }, "slow");
- }
-return false;
+    swal({
+        title: "Are you sure?",
+        text: "You will not be able to recover this imaginary file!",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "Yes, delete it!",
+        closeOnConfirm: false
+    }, function (isConfirm) {
+        if (!isConfirm) return;
+        $.ajax({
+           type: "POST",
+            url: "<?=BASEURL?>board/delete_sub_board",
+            data: {schboardId : schboardId, subBoardId:subBoardId },
+            success: function () {
+               swal({
+                      title: "Deleted successfully",
+                      type: "success",
+                      confirmButtonText: "OK"
+                    }, function(isConfirm){
+                          location.reload();
+                    });
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                swal("Error deleting!", "Please try again", "error");
+            }
+        });
+    });
 }
 </script>
 

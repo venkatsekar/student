@@ -53,12 +53,7 @@ class Authentication {
 	 */
 	private function token() {
 	
-		if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR']) {
-    		$clientIpAddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
-		} else {
-    		$clientIpAddress = $_SERVER['REMOTE_ADDR'];
-		}
-		return md5($this->config['secret_word'] . $clientIpAddress . $_SERVER['HTTP_USER_AGENT']);
+		return md5($this->config['secret_word'] . $_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT']);
 	
 	}
 
@@ -73,53 +68,78 @@ class Authentication {
 		$username = filter_var($username, FILTER_SANITIZE_STRING); //FILTER_SANITIZE_EMAIL
 		$password = filter_var($password, FILTER_SANITIZE_STRING);
 	
-		//$sql = "SELECT * FROM " . $this->config['user_table'] . " WHERE username = '" . $username . "' AND password = '" . sha1($password) . "' AND active = 1";
-		
-		$sql = "SELECT * FROM " . $this->config['user_table'] . " WHERE email = '" . $username . "' AND password = '" . md5($password) . "' AND status = 1";
-		
+		$sql = "SELECT * FROM user_info u INNER JOIN user_role ur ON u.user_info_id = ur.user_info_id  WHERE u.email_id = '" . $username . "' AND u.password = '" . $password . "' AND u.status = 1";
+		//echo $sql;
 		if ($this->db->row_count($sql)) {
+	
 			session_regenerate_id(true);
 
 			$this->session->set('token', $this->token());
-			$this->session->set('logged_in', true); 
-
+			$this->session->set('logged_in', true);
+	
 			$result = $this->db->query($sql);
 			$result = $result[0];
-			$this->session->set('user_id', $result['user_id']);
-			$this->session->set('user_name', $result['first_name'].' '.$result['last_name']);
-			$this->session->set('email', $result['email']);
-			$this->session->set('company_id', $result['company_id']);
+			$this->session->set('user_id', $result['user_info_id']);			
+			$this->session->set('role_id', $result['role_id']);
+			$this->session->set('email', $result['email_id']);
+			$this->session->set('firstname', $result['first_name']);
+			$this->session->set('lastname', $result['last_name']);
 			$this->session->set('last_activity', time());
-     		return true;
+			
+			$query1 = " SELECT  p.page_name,p.page_id
+					   FROM roles_pages rp INNER JOIN pages p ON rp.page_id = p.page_id 
+					   WHERE rp.role_id = " . $result['role_id'] . "  AND rp.status = 1 AND p.status = 1" ;
+			
+			$RolePermission= $this->db->query($query1);
+			$this->session->set('RolePermission', $RolePermission);
+
+			return true;
 		} else {
+
 			return false;
 			
 		}
-		
-		
+	
 	}
+
+
 	
 	/**
 	 * Add User
 	 *
 	 * @access public
 	 */
-	public function add_user($CompanyId, $FirstName, $LastName, $Email, $Password){
+	public function add_user($username, $password, $user_group=0){
 
 
-		$values = array(
-				'company_id' 	=> $CompanyId,
-				'first_name'	=> $FirstName, 
-				'last_name'		=> $LastName, 
-				'email'			=> $Email, 
-				'password'		=> md5($Password),
-				'status'		=> 1
+		$username = filter_var($username, FILTER_SANITIZE_STRING);
+		$password = filter_var($password, FILTER_SANITIZE_STRING);
+
+
+		$sql = "SELECT * FROM " . $this->config['user_table'] . " WHERE username = '" . $username . "'";
+		
+		if ($this->db->row_count($sql) == 0) {
+
+
+			$values = array(
+				'username'		=> $username, 
+				'password'		=> $password,
+				'active'		=> 1,
+				'user_group'	=> $user_group
 			);
 	
 			
-			return $this->db->insert($this->config['user_table'], $values);
+			$this->db->insert($this->config['user_table'], $values);
+			
+			return true;
+			
+		} else {
+	
+			return false;
 			
 		}
+
+	}
 	
 
 
@@ -141,23 +161,6 @@ class Authentication {
 		return false;
 	
 	}
-	/**
-	 * Company Id
-	 *
-	 * @access public
-	 */
-	public function company_id() {
-	
-		if ($this->session->get('company_id')) {
-	
-			return $this->session->get('company_id');
-	
-		}
-	
-		return false;
-	
-	}
-
 
 	/**
 	 * Role Id
@@ -167,7 +170,6 @@ class Authentication {
 	public function role_id() {
 	
 		if ($this->session->get('role_id')) {
-	
 			return $this->session->get('role_id');
 	
 		}
@@ -183,26 +185,9 @@ class Authentication {
 	 */
 	public function user_email() {
 	
-		if ($this->session->get('email_address')) {
+		if ($this->session->get('email_id')) {
 	
-			return $this->session->get('email_address');
-	
-		}
-	
-		return false;
-	
-	}
-	
-	/**
-	 * Username
-	 *
-	 * @access public
-	 */
-	public function username() {
-	
-		if ($this->session->get('username')) {
-	
-			return $this->session->get('username');
+			return $this->session->get('email_id');
 	
 		}
 	
@@ -219,7 +204,7 @@ class Authentication {
 
 		//echo "<pre>"; print_r($_SESSION);echo "</pre>"; die();
 	
-		if ($this->session->get('firstname') || $this->session->get('lastname')) {
+		if ($this->session->get('firstname') && $this->session->get('lastname')) {
 	
 			return $this->session->get('firstname')." ".$this->session->get('lastname');
 	
@@ -228,6 +213,8 @@ class Authentication {
 		return false;
 	
 	}
+
+
 
 	/**
 	 * Set Last Activity
@@ -302,21 +289,9 @@ class Authentication {
 	 * @access public
 	 */
 	public function passwordrecover($Email){
-		$query="SELECT * FROM users WHERE email = '$Email' AND status= 1";
+		$query="SELECT * FROM user_info WHERE email_id = '$Email' AND status= 1";
 		
 		return $this->db->query($query);
-
-	}
-	
-	/**
-	 * Password recover
-	 *
-	 * @access public
-	 */
-	public function check_user_exist($Email){
-		$query="SELECT * FROM user_info usi,users u WHERE u.user_info_id = usi.user_info_id AND usi.email_address = '$Email' AND usi.status= 1";
-		
-		return $this->db->row_count($query);
 
 	}
 	/**
@@ -325,19 +300,18 @@ class Authentication {
 	 * @access public
 	 */
 	public function update_password($user_id, $password) {
-		
+	
 		$password = filter_var($password, FILTER_SANITIZE_STRING);
 	
-		if ($this->db->row_count("SELECT user_id FROM users WHERE user_id = '" . $user_id . "'")) {
+		if ($this->db->row_count("SELECT user_info_id FROM user_info WHERE user_info_id = '" . $user_id . "'")) {
 	
-			$password = md5($password);
-			
-				
+			$password = $password;
+	
 			$where = array(
-					'user_id' => $user_id
+					'user_info_id' => $user_id
 			);
 
-			$this->db->update('users', array('password' => $password), $where);
+			$this->db->update(user_info , array('password' => $password), $where);
 	
 			return true;
 	
@@ -377,26 +351,14 @@ class Authentication {
 		return false;
 	}
 
-
-	/**
-	 * Bundles
-	 *
-	 * @access public
-	 */
-	public function bundles()
-	 {			
-		$sql = "SELECT * FROM bundles where status = 1";				
-		return $this->db->query($sql);
-	} 
 	/**
 	*
 	*
 	*/
-	
 	public function hasPermission($roleId, $pageName) {
 
 		 $query = "SELECT  *
-					   FROM role_pages rp INNER JOIN pages p ON rp.page_id = p.page_id 
+					   FROM roles_pages rp INNER JOIN pages p ON rp.page_id = p.page_id 
 					   WHERE rp.role_id = " . $roleId . " AND p.page_name = '" . $pageName . "' AND rp.status = 1 AND p.status = 1";
 
 	     if ($this->db->row_count($query)) {
