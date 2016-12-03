@@ -50,10 +50,13 @@
                     <a href="<?=BASEURL;?>studentclass"><i class="fa fa-calculator"></i> <span class="nav-label">Class</span></a>
                 </li>
                 <li>
-                    <a href="<?=BASEURL;?>syllabus"><i class="fa fa-diamond"></i> <span class="nav-label">Syllabus</span></a>
+                    <a href="<?=BASEURL;?>role"><i class="fa fa-wifi"></i> <span class="nav-label">Role</span></a>
                 </li>
                 <li>
-                    <a href="<?=BASEURL;?>role"><i class="fa fa-wifi"></i> <span class="nav-label">Role</span></a>
+                    <a href="<?=BASEURL;?>preparation"><i class="fa fa-clipboard"></i> <span class="nav-label">Preparation</span></a>
+                </li>
+                <li>
+                    <a href="<?=BASEURL;?>settings"><i class="fa fa-user-md"></i> <span class="nav-label">Settings</span></a>
                 </li>
             </ul>
 
@@ -62,12 +65,9 @@
 
         <div id="page-wrapper" class="gray-bg">
         <div class="row border-bottom">
-        <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0;height: 66px;">
-			<ul class="nav navbar-top-links navbar-right">
-               
-            </ul>
-
-        </nav>
+         <?php
+            load_view("common/header" , array("name" => $name));
+        ?>
         </div>
             <div class="row wrapper border-bottom white-bg page-heading">
                 <div class="col-lg-10">
@@ -85,7 +85,7 @@
                             <h5>Add Teacher</h5>
                         </div>
                         <div class="ibox-content">
-                            <form id="form" action="#" class="wizard-big">
+                            <form id="form" action="<?=BASEURL?>teacher/add_teacher" class="wizard-big"  enctype="multipart/form-data">
                                 <h1>Basic</h1>
                                 <fieldset>
                                     <h2>Basic Information</h2>
@@ -93,7 +93,7 @@
                                         <div class="col-lg-12">
                                             <div class="form-group">
                                                 <label>Teacher name *</label>
-                                                <input id="teacherName" name="teacherName" type="text" class="form-control required">
+                                                <input id="teacherName" name="teacherName" type="text" class="form-control">
                                             </div>
 											<div class="form-group">
                                                 <label>First name</label>
@@ -105,41 +105,53 @@
                                             </div>
 											<div class="form-group">
                                                 <label>Email address *</label>
-                                                <input id="emailAddress" name="emailAddress" type="text" class="form-control required">
+                                                <input id="emailAddress" name="emailAddress" type="email" class="form-control required">
                                             </div>
                                             <div class="form-group">
                                                 <label>Password *</label>
-                                                <input id="password" name="password" type="text" class="form-control required">
+                                                <input id="password" name="password" type="password" class="form-control required">
                                             </div>
                                             <div class="form-group">
                                                 <label>Confirm Password *</label>
-                                                <input id="confirm" name="confirm" type="text" class="form-control">
+                                                <input id="confirm" name="confirm" type="password" class="form-control required">
                                             </div>
 											<div class="form-group">
-                                                <label>How do you study about home</label>
+                                                <label>How do you know about studyhome</label>
                                                 <textarea id="aboutStudy" name="aboutStudy" type="text" class="form-control"></textarea>
                                             </div>
 											<div class="form-group">
                                                 <label>Qualification</label>
 												<div class="input_fields_wrapper">
-												<div class="input-group m-b"><input type="text" name="teacher_quali[]" class="form-control">
-												<span class="input-group-btn">
+												<div class="input-group m-b"><div class="col-md-4"><input type="text" name="teacher_quali[]" class="form-control" placeholder="Qualification"></div>
+                                                <div class="col-md-4"><input type="text" name="teacher_university[]" class="form-control" placeholder="University"></div><div class="col-md-3"><input type="text" name="teacher_grade[]" placeholder="Grade" class="form-control"></div>
+												<span class="col-md-1 input-group-btn">
 													<button type="button" class="btn btn-primary add_field_qualify">Add</button> </span> 
 												</div>
 												</div>
                                             </div>
-											<div class="form-group">
+											<!--<div class="form-group">
                                                 <label>Document</label>
-                                                <input id="document" name="document" type="file" class="form-control">
-                                            </div>
+                                                <input id="teacher_document" name="teacher_document" type="file" class="form-control">
+                                            </div>-->
 											<div class="form-group">
                                                 <label>List of class</label>
-                                                <select name="classId[]" class="form-control" id="classId" multiple>
-                                                    <option value="">Select Class</option>
-                                                    <?php foreach($ClassList as $_c){?>
-                                                    <option value="<?=$_c['class_id'];?>"><?=$_c['class_name'];?></option>
-                                                    <?php }?>
-                                                </select>
+                                                <div class="col-md-12">
+                                                    <?php foreach ($ClassList as $_c) {?>
+                                                    <div class="col-md-4">
+                                                        <div class="i-checks"><label> <input type="checkbox" name="classId[]" value="<?=$_c['class_id'];?>" id="<?=$_c['class_id']?>"> <i></i> <?=$_c['class_name'];?> </label></div>&nbsp;&nbsp;&nbsp; 
+                                                    </div>
+                                                    <?php } ?>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>List of Subject</label>
+                                                <div class="col-md-12">
+                                                    <?php foreach ($SubjectList as $_) {?>
+                                                    <div class="col-md-4">
+                                                        <div class="i-checks"><label> <input type="checkbox" name="subjectId[]" value="<?=$_['subject_id'];?>" id="<?=$_['subject_id']?>"> <i></i> <?=$_['subject_name'];?> </label></div>&nbsp;&nbsp;&nbsp; 
+                                                    </div>
+                                                    <?php } ?>
+                                                </div>
                                             </div>
 											<div class="form-group">
                                                 <label>Enter your secret question</label>
@@ -176,11 +188,11 @@
                                             </div>
                                             <div class="form-group">
                                                 <label>IFSC code</label>
-                                                <input id="ifsc" name="ifsc" type="text" class="form-control">
+                                                <input id="ifsc" name="ifsc" type="text" class="form-control specialChar" maxlength="10">
                                             </div>
 											<div class="form-group">
 												<label>Class room</label>
-												<input id="classRoom" name="classRoom" type="text" class="form-control">
+												<input id="classRoom" name="classRoom" type="text" class="form-control specialChar">
 											 </div>
 										</div>
                                         <div class="col-lg-6">
@@ -242,15 +254,15 @@
                                             </div>
 											<div class="form-group">
                                                 <label>Bank accno</label>
-                                                <input id="bankAccno" name="bankAccno" type="text" class="form-control">
+                                                <input id="bankAccno" name="bankAccno" type="text" class="form-control number">
                                             </div>
 											<div class="form-group">
                                                 <label>Bank name</label>
-                                                <input id="bankName" name="bankName" type="text" class="form-control">
+                                                <input id="bankName" name="bankName" type="text" class="form-control specialChar">
                                             </div>
 											<div class="form-group">
                                                 <label>Bank branch</label>
-                                                <input id="bankBranch" name="bankBranch" type="text" class="form-control">
+                                                <input id="bankBranch" name="bankBranch" type="text" class="form-control specialChar">
                                             </div>
 										</div>
                                     </div>
@@ -324,8 +336,9 @@
     <!-- Data picker -->
     <script src="<?=BASEURL;?>public/assets/js/plugins/datapicker/bootstrap-datepicker.js"></script>
     <script src="<?=BASEURL;?>public/assets/js/plugins/sweetalert/sweetalert.min.js"></script>
-
-    <script>
+   <script src="https://cdn.jsdelivr.net/jquery.validation/1.15.0/jquery.validate.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.15.0/additional-methods.min.js"></script>
+   <script>
         $(document).ready(function(){
             $("#wizard").steps();
             $("#form").steps({
@@ -388,34 +401,85 @@
                 onFinished: function (event, currentIndex)
                 {
                     var form = $(this);
-
+                   
                     // Submit form input
                     form.submit();
                 }
             }).validate({
+
+
                         errorPlacement: function (error, element)
                         {
                             element.before(error);
                         },
                         rules: {
+                             teacherName: {
+                                required: true,
+                                specialChar: true
+                            },
+                              password: {
+                                required: true,
+                                pwchecklowercase: true,
+                                pwcheckuppercase: true,
+                                pwchecknumber: true,
+                                pwcheckconsecchars: true,
+                                pwcheckspechars: true,
+                                minlength: 8,
+                                maxlength: 20
+                            },
+                            city: {
+                                specialChar: true
+                            },
                             confirm: {
                                 equalTo: "#password"
+                            },
+                             dob: {
+                                dob: true
+                            },
+                            photo: {required: true, 
+                                 extension: "jpg|jpeg|png"
                             }
-                        },
+                         },
+                       
+                       
                          submitHandler: function (form) {
              //alert('valid form submission'); // for demo
-             $.ajax({
+
+                var formData = new FormData(form);
+
+                $.ajax({
+                type: 'POST',
+                url: $(form).attr('action'),
+                data:formData,
+                cache:false,
+                contentType: false,
+                processData: false,
+                success: function(data) {
+                    swal({
+                      title: "Added successfully",
+                      type: "success",
+                      confirmButtonText: "OK"
+                    }, function(isConfirm){
+                          window.location.href = "<?=BASEURL?>teacher/";
+                    });
+                }
+                });
+             /*$.ajax({
                  type: "POST",
                  url: "<?=BASEURL?>teacher/add_teacher",
                  data: $(form).serialize(),
-                 success: function (data) {
-
-                   swal({
-                title: "Student",
-                text: "The value added successfully"
-            });
+                success: function (data) {
+                    swal({
+                      title: "Added successfully",
+                      type: "success",
+                      confirmButtonText: "OK"
+                    }, function(isConfirm){
+                          window.location.href = "<?=BASEURL?>teacher/";
+                    });
+                   
                 }
-             });
+            
+             });*/
              return false; // required to block normal submit since you used ajax
          }
                     });
@@ -469,7 +533,7 @@
 				e.preventDefault();
 				if(x < max_fields){ //max input box allowed
 					x++; //text box increment
-					$(wrapper1).append('<div class="form-group input-group m-b"><input type="text" name="teacher_quali[]" class="form-control"><span class="input-group-btn remove_field1"><button type="button" class="btn btn-danger">Remove</button> </span></div>'); //add input box
+					$(wrapper1).append('<div class="input_fields_wrapper"><div class="input-group m-b"><div class="col-md-4"><input type="text" name="teacher_quali[]" class="form-control" placeholder="Qualification"></div><div class="col-md-4"><input type="text" name="teacher_university[]" placeholder="University" class="form-control"></div><div class="col-md-3"><input type="text" name="teacher_grade[]" class="form-control" placeholder="Grade"></div><span class="col-md-1 input-group-btn remove_field1"><button type="button" class="btn btn-danger">Remove</button> </span></div></div>'); //add input box
 					
 				}
 				
@@ -486,9 +550,99 @@
                 forceParse: false,
                 calendarWeeks: true,
                 autoclose: true,
-                format: "dd/mm/yyyy"
+                format: "DD/MM/YYYY"
             });
 		});
+$(document).ready(function () {
+    $.validator.addMethod("dob", function (value, element) {
+        var result = true;
+        var ageMin = 17;
+        var ageMax = 85;
+
+        //is the date valid?
+        //is it within the allowed range
+        var myDate = value.split("/");
+        var subDay = myDate[0];
+        var subMonth = myDate[1] - 1;
+        var subYear = myDate[2];
+        var subDate = new Date(subYear, subMonth, subDay);
+        // this will "correct" any out of range input
+        var calcDay = subDate.getDate();
+        var calcMonth = subDate.getMonth();
+        var calcYear = subDate.getFullYear();
+        // this checks to see if any of the submitted input was out of range
+        // comment this out to ignore the discrepancy if you want to set a "corrected" value below
+        if(value != '')
+        {
+        if (calcDay != subDay || calcMonth != subMonth || calcYear != subYear) {
+            $.validator.messages.dob = "Invalid date";
+            result = false;
+        }
+        }
+        if (result) {
+            var currDate = new Date();
+            var currYear = currDate.getFullYear();
+            var currMonth = currDate.getMonth();
+            var currDay = currDate.getDate();
+
+            var age = currYear - subYear;
+            
+            if (subMonth > currMonth) {
+                age = age - 1; // next birthday not yet reached
+            } else if (subMonth == currMonth && currDay < subDay) {
+                age = age - 1;
+            } 
+
+            if (ageMin != undefined) {
+                if (age < ageMin) {
+                    $.validator.messages.dob = "Min 18 years old";
+                    result = false;
+                } 
+            }
+            if(value != '')
+            {
+            if (ageMax != undefined) {
+                if (age > ageMax) {
+                    $.validator.messages.dob = "Invalid date";
+                    result = false;
+                }
+            }
+            }
+        }
+        return result;
+    }, "Please enter a date in the format DD/MM/YYYY");
+jQuery.validator.addMethod("specialChar", function(value, element) {
+     return this.optional(element) || /([0-9a-zA-Z\s])$/.test(value);
+  }, "Special character not allowed.");
+
+ $.validator.addMethod("pwcheckspechars", function (value) {
+        
+        return /[!@#$%^&*()_=\[\]{};':"\\|,.<>\/?+-]/.test(value)
+    }, "The password must contain at least one special character");
+    
+    $.validator.addMethod("pwcheckconsecchars", function (value) {
+        return ! (/(.)\1\1/.test(value)) // does not contain 3 consecutive identical chars
+    }, "The password must not contain 3 consecutive identical characters");
+
+    $.validator.addMethod("pwchecklowercase", function (value) {
+        return /[a-z]/.test(value) // has a lowercase letter
+    }, "The password must contain at least one lowercase letter");
+    
+    $.validator.addMethod("pwcheckrepeatnum", function (value) {
+        return /\d{2}/.test(value) // has a lowercase letter
+    }, "The password must contain at least one lowercase letter");
+    
+    $.validator.addMethod("pwcheckuppercase", function (value) {
+        return /[A-Z]/.test(value) // has an uppercase letter
+    }, "The password must contain at least one uppercase letter");
+    
+    $.validator.addMethod("pwchecknumber", function (value) {
+        return /\d/.test(value) // has a digit
+    }, "The password must contain at least one number");
+    
+
+  });
+
     </script>
 
 </body>

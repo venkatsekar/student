@@ -6,7 +6,7 @@ class BoardController extends Controller {
 	parent::__construct($controller, $action);
 		$this->_auth = new Authentication();
 
-		/*if (!$this->_auth->logged_in()) {
+		if (!$this->_auth->logged_in()) {
 			header('Location: '.BASEURL.'login');
 			die();
 		}
@@ -21,17 +21,50 @@ class BoardController extends Controller {
 		
 		$this->_view->set('sid', $this->_auth->user_id());
 		$this->_view->set('name', $this->_auth->name());
-		*/
+		
 	}
 	
 	function index() 
 	{	
+		if(!$this->_auth->hasPermission($this->_auth->role_id(), 'board')) {
+			header("Location: ". BASEURL . "dashboard/?perm=0");
+		}
+
 		$this->render = 1;
 		$this->_view->set("pagename", "index");
 
 		$BoardList = $this->_model->list_board();
 		$this->_view->set('BoardList', $BoardList);
 	}
+
+	function add()
+	{
+		if(!$this->_auth->hasPermission($this->_auth->role_id(), 'board/add')) {
+			header("Location: ". BASEURL . "dashboard/?perm=0");
+		}
+
+		$this->render = 1;
+		$this->_view->set("pagename", "add");
+	}
+
+	function edit($SchBoardId)
+	{
+		if(!$this->_auth->hasPermission($this->_auth->role_id(), 'board/edit')) {
+			header("Location: ". BASEURL . "dashboard/?perm=0");
+		}
+
+		$this->render = 1;
+		$this->_view->set("pagename", "edit");
+
+		$SchBoardId = base64_decode($SchBoardId);
+
+		$EditBoardList = $this->_model->list_edit_board($SchBoardId);
+		$this->_view->set('EditBoardList', $EditBoardList);
+
+		$EditTermList = $this->_model->list_edit_terms($SchBoardId);
+		$this->_view->set('EditTermList', $EditTermList);
+	}
+
 	function board()
 	{
 		$this->render = 0;
@@ -46,9 +79,35 @@ class BoardController extends Controller {
 		}
 		else
 		{
-			$Result = $this->_model->add_board($BoardName);
+			$SchBoardId = $this->_model->add_board($BoardName);
+			for($i=0; $i<count($_POST['noofterms']); $i++)
+			{
+			$Terms = $_POST['noofterms'][$i];
+			$this->_model->add_new_terms($SchBoardId, $Terms);
+			}
 			echo 'Added Successfully';
 		} 
+	}
+
+	function edit_terms()
+	{
+		
+		$Terms = $_POST['terms'];
+		if(@$_POST['schoolBoardId'])
+		{
+		 	$Result = $this->_model->add_new_terms($_POST['schoolBoardId'], $Terms);	
+		}
+		else
+		{
+			$BoardTermId = $_POST['boardTermId'];
+			$Result = $this->_model->update_terms($BoardTermId, $Terms);
+		}
+
+	}
+	function delete_terms()
+	{
+		$BoardTermId = $_POST['boardTermId'];
+		$Result = $this->_model->delete_terms($BoardTermId);
 	}
 	function delete_board()
 	{
@@ -67,6 +126,8 @@ class BoardController extends Controller {
 		$SubBoardList = $this->_model->list_subboard($SchBoardId);
 		$this->_view->set('SubBoardList', $SubBoardList);
 	}
+
+	
 	function add_subboard()
 	{
 		$this->render = 0;
@@ -78,12 +139,12 @@ class BoardController extends Controller {
 		{
 			$SubBoardId = $_POST['subBoardId'];
 			$Result = $this->_model->update_sub_board($SubBoardId, $SchBoardId,$SubBoardName,$Description);
-			echo 'Updated Successfully';
+			echo 'edit';
 		}
 		else
 		{
 			$Result = $this->_model->add_sub_board($SubBoardName,$SchBoardId,$Description);
-			echo 'Added Successfully';
+			echo 'add';
 		} 
 	}
 	function delete_sub_board()
@@ -92,6 +153,6 @@ class BoardController extends Controller {
 		$SchBoardId = $_POST['schboardId'];
 		$SubBoardId = $_POST['subBoardId'];
 		$Result = $this->_model->delete_sub_board($SubBoardId, $SchBoardId);
-		echo 'Deleted Successfully';
+		echo 'delete';
 	}
 }

@@ -21,7 +21,64 @@ class Board extends Model {
 						'last_modified' => $CurrentTime,
 						'status' => 1
 					);
-		return $this->db->insert('school_boards', $value);
+		$this->db->insert('school_boards', $value);
+		return $this->db->lastinsertid();
+	}
+
+	function add_new_terms($SchBoardId, $Terms)
+	{
+		date_default_timezone_set('Asia/Kolkata');
+
+		$DateTime = new DateTime();
+		$CurrentTime = $DateTime ->format('y-m-d H:i:s');
+		$value =  array('terms' => $Terms,
+						'school_board_id' => $SchBoardId,
+						'date_added' => $CurrentTime,
+						'last_modified' => $CurrentTime,
+						'status' => 1
+					);
+		$this->db->insert('board_terms', $value);
+		return $this->db->lastinsertid();
+	}
+
+	function list_edit_board($SchBoardId)
+	{
+		$query = "SELECT DISTINCT * FROM school_boards
+				  WHERE status = 1 AND school_board_id = '$SchBoardId'";
+		return $this->db->query($query);
+	}
+
+	function list_edit_terms($SchBoardId)
+	{
+		$query = "SELECT DISTINCT * FROM board_terms
+				  WHERE status = 1 AND school_board_id = '$SchBoardId'";
+		return $this->db->query($query);
+	}
+
+	function update_terms($BoardTermId, $Terms)
+	{
+		date_default_timezone_set('Asia/Kolkata');
+
+		$DateTime = new DateTime();
+		$CurrentTime = $DateTime ->format('y-m-d H:i:s');
+		$value = array('terms' => $Terms,
+					   'last_modified' => $CurrentTime
+					   );
+		$where = array('board_term_id' => $BoardTermId);
+		return $this->db->update('board_terms', $value, $where);
+	}
+
+	function delete_terms($BoardTermId)
+	{
+		date_default_timezone_set('Asia/Kolkata');
+
+		$DateTime = new DateTime();
+		$CurrentTime = $DateTime ->format('y-m-d H:i:s');
+		$value = array('last_modified' => $CurrentTime,
+					   'status' => 0
+					   );
+		$where = array('board_term_id' => $BoardTermId);
+		return $this->db->update('board_terms', $value, $where);
 	}
 	//Update Roles
 	function update_board($SchBoardId, $BoardName)
@@ -47,6 +104,10 @@ class Board extends Model {
 		$value = array( 'last_modified' => $CurrentTime,
 						'status' => 0);
 		$where = array('school_board_id' => $SchBoardId);
+		$boardvalue = array( 'last_modified' => $CurrentTime,
+						'status' => 0);
+		$boardwhere = array('school_board_id' => $SchBoardId);
+		$this->db->update('board_terms', $boardvalue, $boardwhere);
 		return $this->db->update('school_boards', $value, $where);
 
 	}

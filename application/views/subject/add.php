@@ -36,26 +36,26 @@
                    
                 </li>
                 <li>
-                    <a href="<?=BASEURL;?>student"><i class="fa fa-th-large"></i> <span class="nav-label">Student Profile</span></a>
+                    <a href="<?=BASEURL;?>student"><i class="fa fa-users"></i> <span class="nav-label">Student Profile</span></a>
                     
                 </li>
                 <li>
-                    <a href="<?=BASEURL;?>teacher"><i class="fa fa-diamond"></i> <span class="nav-label">Teacher Profile</span></a>
+                    <a href="<?=BASEURL;?>teacher"><i class="fa fa-user-md"></i> <span class="nav-label">Teacher Profile</span></a>
                 </li>
                 <li>
-                    <a href="<?=BASEURL;?>board"><i class="fa fa-diamond"></i> <span class="nav-label">Board</span></a>
+                    <a href="<?=BASEURL;?>board"><i class="fa fa-clipboard"></i> <span class="nav-label">Board</span></a>
                 </li>
                 <li>
-                    <a href="<?=BASEURL;?>studentclass"><i class="fa fa-diamond"></i> <span class="nav-label">Class</span></a>
+                    <a href="<?=BASEURL;?>studentclass"><i class="fa fa-calculator"></i> <span class="nav-label">Class</span></a>
                 </li>
                 <li>
-                    <a href="<?=BASEURL;?>syllabus"><i class="fa fa-diamond"></i> <span class="nav-label">Syllabus</span></a>
+                    <a href="<?=BASEURL;?>role"><i class="fa fa-wifi"></i> <span class="nav-label">Role</span></a>
                 </li>
-                 <li>
-                    <a href="<?=BASEURL;?>users"><i class="fa fa-diamond"></i> <span class="nav-label">Users</span></a>
+                <li>
+                    <a href="<?=BASEURL;?>preparation"><i class="fa fa-clipboard"></i> <span class="nav-label">Preparation</span></a>
                 </li>
-                 <li>
-                    <a href="<?=BASEURL;?>role"><i class="fa fa-diamond"></i> <span class="nav-label">Role</span></a>
+                <li>
+                    <a href="<?=BASEURL;?>settings"><i class="fa fa-user-md"></i> <span class="nav-label">Settings</span></a>
                 </li>
             </ul>
 
@@ -64,12 +64,9 @@
 
         <div id="page-wrapper" class="gray-bg">
         <div class="row border-bottom">
-        <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0;height: 66px;">
-            <ul class="nav navbar-top-links navbar-right">
-               
-            </ul>
-
-        </nav>
+       <?php
+            load_view("common/header" , array("name" => $name));
+        ?>
         </div>
             <div class="row wrapper border-bottom white-bg page-heading">
                 <div class="col-lg-10">

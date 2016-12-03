@@ -50,10 +50,13 @@
                     <a href="<?=BASEURL;?>studentclass"><i class="fa fa-calculator"></i> <span class="nav-label">Class</span></a>
                 </li>
                 <li>
-                    <a href="<?=BASEURL;?>syllabus"><i class="fa fa-diamond"></i> <span class="nav-label">Syllabus</span></a>
+                    <a href="<?=BASEURL;?>role"><i class="fa fa-wifi"></i> <span class="nav-label">Role</span></a>
                 </li>
                 <li>
-                    <a href="<?=BASEURL;?>role"><i class="fa fa-wifi"></i> <span class="nav-label">Role</span></a>
+                    <a href="<?=BASEURL;?>preparation"><i class="fa fa-clipboard"></i> <span class="nav-label">Preparation</span></a>
+                </li>
+                <li>
+                    <a href="<?=BASEURL;?>settings"><i class="fa fa-user-md"></i> <span class="nav-label">Settings</span></a>
                 </li>
             </ul>
 
@@ -62,12 +65,9 @@
 
         <div id="page-wrapper" class="gray-bg">
         <div class="row border-bottom">
-        <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0;height: 66px;">
-            <ul class="nav navbar-top-links navbar-right">
-               
-            </ul>
-
-        </nav>
+         <?php
+            load_view("common/header" , array("name" => $name));
+        ?>
         </div>
             <div class="row wrapper border-bottom white-bg page-heading">
                 <div class="col-lg-10">
@@ -85,12 +85,16 @@
                             <h5>Edit Student</h5>
                         </div>
                         <div class="ibox-content">
-                            <form id="form" action="" class="wizard-big" >
+                            <form id="form" action="<?=BASEURL?>student/add_student" class="wizard-big"  enctype="multipart/form-data">
                                 <h1>Student</h1>
                                 <fieldset>
                                     <h2>Student Information</h2>
                                     <div class="row">
                                         <div class="col-lg-12">
+                                            <div class="form-group">
+                                                <label>Student name *</label>
+                                                <input id="studentName" name="studentName" type="text" class="form-control required" value="<?=@$EditStudent[0]['login_id'];?>">
+                                            </div>
                                             <div class="form-group">
                                                 <input type="hidden" name="userInfoId" id="userInfoId" value="<?=@$EditStudent[0]['user_info_id'];?>"/>
                                                 <input type="hidden" name="studentInfoId" id="studentInfoId" value="<?=@$EditStudent[0]['student_info_id'];?>"/>
@@ -104,19 +108,15 @@
                                             </div>
                                             <div class="form-group">
                                                 <label>Email address *</label>
-                                                <input id="emailAddress" name="emailAddress" type="text" class="form-control required" value="<?=@$EditStudent[0]['email_id'];?>">
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Student name *</label>
-                                                <input id="studentName" name="studentName" type="text" class="form-control required" value="<?=@$EditStudent[0]['login_id'];?>">
+                                                <input id="emailAddress" name="emailAddress" type="email" class="form-control required" value="<?=@$EditStudent[0]['email_id'];?>">
                                             </div>
                                             <div class="form-group">
                                                 <label>Password *</label>
-                                                <input id="password" name="password" type="text" class="form-control required" value="<?=@$EditStudent[0]['password'];?>">
+                                                <input id="password" name="password" type="password" class="form-control required" value="<?=@$EditStudent[0]['password'];?>">
                                             </div>
                                             <div class="form-group">
-                                                <label>Confirm Password *</label>
-                                                <input id="confirm" name="confirm" type="text" class="form-control" value="<?=@$EditStudent[0]['password'];?>">
+                                                <label>Confirm Password</label>
+                                                <input id="confirm" name="confirm" type="password" class="form-control" value="<?=@$EditStudent[0]['password'];?>">
                                             </div>
                                             <div class="form-group">
                                                 <label>Enter your secret question</label>
@@ -127,7 +127,7 @@
                                                 <input id="ansQues" name="ansQues" type="text" class="form-control" value="<?=@$EditStudent[0]['answer'];?>">
                                             </div>
                                             <div class="form-group">
-                                                <label>How do you study about home</label>
+                                                <label>How do you know about studyhome</label>
                                                 <textarea id="aboutStudy" name="aboutStudy" type="text" class="form-control" value="<?=@$EditStudent[0]['know_about'];?>"></textarea>
                                             </div>
                                         </div>
@@ -148,47 +148,49 @@
                                                 <input id="motherName" name="motherName" type="text" class="form-control" value="<?=@$EditStudent[0]['mother_name'];?>">
                                             </div>
                                             <div class="form-group" id="data_1">
+                                                <?php $ConvertDOB = str_replace('-', '/', $EditStudent[0]['date_of_birth']);
+                                                    $DOB = date('d/m/Y', strtotime($ConvertDOB));?>
                                                 <label class="font-noraml">Date of birth</label>
                                                 <div class="input-group date">
-                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span><input type="text" class="form-control" placeholder="DD/MM/YYYY" name="dob" id="dob" value="<?=@$EditStudent[0]['date_of_birth'];?>">
+                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span><input type="text" class="form-control required" placeholder="DD/MM/YYYY" name="dob" id="dob" value="<?=@$DOB?>">
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label>City</label>
-                                                <input id="city" name="city" type="text" class="form-control" value="<?=@$EditStudent[0]['city'];?>">
+                                                <input id="city" name="city" type="text" class="form-control specialChars" value="<?=@$EditStudent[0]['city'];?>">
                                             </div>
                                             <div class="form-group">
                                                 <label>Preferred contact number</label>
                                                 <div class="input_fields_wrap">
-                                                <div class="input-group m-b"><input type="text" name="preference_contact[]" class="form-control" value="<?=@$EditStudent[0]['first_contact_number'];?>">
+                                                <div class="input-group m-b"><input type="text" name="preference_contact[]" class="form-control number" value="<?=@$EditStudent[0]['first_contact_number'];?>">
                                                 <span class="input-group-btn">
                                                     <button type="button" class="btn btn-primary add_field_button">Add</button> </span> 
                                                 </div>
                                                 </div>
                                                 <div class="input_fields_wrap">
-                                                <div class="input-group m-b"><input type="text" name="preference_contact[]" class="form-control" value="<?=@$EditStudent[0]['second_contact_number'];?>">
+                                                <div class="input-group m-b"><input type="text" name="preference_contact[]" class="form-control number" value="<?=@$EditStudent[0]['second_contact_number'];?>">
                                                 </div>
                                                 </div>
                                                 <div class="input_fields_wrap">
-                                                <div class="input-group m-b"><input type="text" name="preference_contact[]" class="form-control" value="<?=@$EditStudent[0]['third_contact_number'];?>">
+                                                <div class="input-group m-b"><input type="text" name="preference_contact[]" class="form-control number" value="<?=@$EditStudent[0]['third_contact_number'];?>">
                                                 </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label>Bank accno</label>
-                                                <input id="bankAccno" name="bankAccno" type="text" class="form-control" value="<?=@$EditStudent[0]['bank_account_number'];?>">
+                                                <input id="bankAccno" name="bankAccno" type="text" class="form-control specialChar" value="<?=@$EditStudent[0]['bank_account_number'];?>">
                                             </div>
                                             <div class="form-group">
                                                 <label>IFSC code</label>
-                                                <input id="ifsc" name="ifsc" type="text" class="form-control" value="<?=@$EditStudent[0]['ifsc_code'];?>">
+                                                <input id="ifsc" name="ifsc" type="text" class="form-control specialChar" value="<?=@$EditStudent[0]['ifsc_code'];?>">
                                             </div>
                                             <div class="form-group">
                                                 <label>Brother name</label>
-                                                <input id="brotherName" name="brotherName" type="text" class="form-control" value="<?=@$EditStudent[0]['brother_name'];?>">
+                                                <input id="brotherName" name="brotherName" type="text" class="form-control specialChar" value="<?=@$EditStudent[0]['brother_name'];?>">
                                             </div>
                                             <div class="form-group">
                                                 <label>Sister name</label>
-                                                <input id="sisterName" name="sisterName" type="text" class="form-control" value="<?=@$EditStudent[0]['sister_name'];?>">
+                                                <input id="sisterName" name="sisterName" type="text" class="form-control specialChar" value="<?=@$EditStudent[0]['sister_name'];?>">
                                             </div>
                                         </div>
                                         <div class="col-lg-6">
@@ -251,22 +253,26 @@
                                             </div>
                                             <div class="form-group">
                                                 <label>Bank name</label>
-                                                <input id="bankName" name="bankName" type="text" class="form-control" value="<?=@$EditStudent[0]['bank_name'];?>">
+                                                <input id="bankName" name="bankName" type="text" class="form-control specialChar" value="<?=@$EditStudent[0]['bank_name'];?>">
                                             </div>
                                             <div class="form-group">
                                                 <label>Bank branch</label>
-                                                <input id="bankBranch" name="bankBranch" type="text" class="form-control" value="<?=@$EditStudent[0]['bank_branch'];?>">
+                                                <input id="bankBranch" name="bankBranch" type="text" class="form-control specialChar" value="<?=@$EditStudent[0]['bank_branch'];?>">
                                             </div>
                                             <div class="form-group" id="data_2">
+                                                 <?php $ConvertBrDOB = str_replace('-', '/', $EditStudent[0]['brother_dob']);
+                                                    $BrotherDOB = date('d/m/Y', strtotime($ConvertBrDOB));?>
                                                  <label>Brother D.O.B</label>
                                                 <div class="input-group date">
-                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span><input id="brotherDob" name="brotherDob" value="<?=@$EditStudent[0]['brother_dob'];?>" placeholder="DD/MM/YYYY" type="text" class="form-control">
+                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span><input id="brotherDob" name="brotherDob" value="<?=@$BrotherDOB?>" placeholder="DD/MM/YYYY" type="text" class="form-control">
                                                 </div>
                                             </div>
                                             <div class="form-group" id="data_3">
+                                                <?php $ConvertSrDOB = str_replace('-', '/', $EditStudent[0]['sister_dob']);
+                                                    $SisterDOB = date('d/m/Y', strtotime($ConvertSrDOB));?>
                                                 <label>Sister D.O.B</label>
                                                 <div class="input-group date">
-                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span><input id="sisterDob" name="sisterdob" type="text" class="form-control"  value="<?=@$EditStudent[0]['sister_dob'];?>" placeholder="DD/MM/YYYY">
+                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span><input id="sisterDob" name="sisterdob" type="text" class="form-control"  value="<?=@$SisterDOB?>" placeholder="DD/MM/YYYY">
                                                 </div>
                                             </div>
                                         </div>
@@ -448,25 +454,64 @@
                         },
                        
                           rules: {
+                            password: {
+                                required: true,
+                                pwchecklowercase: true,
+                                pwcheckuppercase: true,
+                                pwchecknumber: true,
+                                pwcheckconsecchars: true,
+                                pwcheckspechars: true,
+                                minlength: 8,
+                                maxlength: 20
+                            },
+                            city: {
+                                specialChar: true
+                            },
                             confirm: {
                                 equalTo: "#password"
+                            },
+                             dob: {
+                                dob: true
                             }
                         },
                 
                   submitHandler: function (form) {
              //alert('valid form submission'); // for demo
-             $.ajax({
+              var formData = new FormData(form);
+
+                $.ajax({
+                type: 'POST',
+                url: $(form).attr('action'),
+                data:formData,
+                cache:false,
+                contentType: false,
+                processData: false,
+                success: function(data) {
+                    swal({
+                      title: "Updated successfully",
+                      type: "success",
+                      confirmButtonText: "OK"
+                    }, function(isConfirm){
+                          window.location.href = "<?=BASEURL?>student/";
+                    });
+                }
+                });
+             /*$.ajax({
                  type: "POST",
                  url: "<?=BASEURL?>student/add_student",
                  data: $(form).serialize(),
                  success: function (data) {
 
-                   swal({
-                title: "Student",
-                text: "The value updated successfully"
-            });
+                    swal({
+                      title: "Updated successfully",
+                      type: "success",
+                      confirmButtonText: "OK"
+                    }, function(isConfirm){
+                          window.location.href = "<?=BASEURL?>student/";
+                    });
+                   
                 }
-             });
+             });*/
              return false; // required to block normal submit since you used ajax
          }
                     });
@@ -518,7 +563,95 @@
                 format: "dd/mm/yyyy"
             });
         });
+        $(document).ready(function () {
+    $.validator.addMethod("dob", function (value, element) {
+        var result = true;
+        var ageMin = 17;
+        var ageMax = 85;
+
+        //is the date valid?
+        //is it within the allowed range
+        var myDate = value.split("/");
+        var subDay = myDate[0];
+        var subMonth = myDate[1] - 1;
+        var subYear = myDate[2];
+        var subDate = new Date(subYear, subMonth, subDay);
+        // this will "correct" any out of range input
+        var calcDay = subDate.getDate();
+        var calcMonth = subDate.getMonth();
+        var calcYear = subDate.getFullYear();
+        // this checks to see if any of the submitted input was out of range
+        // comment this out to ignore the discrepancy if you want to set a "corrected" value below
+        if(value != '')
+        {
+        if (calcDay != subDay || calcMonth != subMonth || calcYear != subYear) {
+            $.validator.messages.dob = "Invalid date";
+            result = false;
+        }
+        }
+        if (result) {
+            var currDate = new Date();
+            var currYear = currDate.getFullYear();
+            var currMonth = currDate.getMonth();
+            var currDay = currDate.getDate();
+
+            var age = currYear - subYear;
+            
+            if (subMonth > currMonth) {
+                age = age - 1; // next birthday not yet reached
+            } else if (subMonth == currMonth && currDay < subDay) {
+                age = age - 1;
+            } 
+
+            if (ageMin != undefined) {
+                if (age < ageMin) {
+                    $.validator.messages.dob = "Min 18 years old";
+                    result = false;
+                } 
+            }
+            if(value != '')
+            {
+            if (ageMax != undefined) {
+                if (age > ageMax) {
+                    $.validator.messages.dob = "Invalid date";
+                    result = false;
+                }
+            }
+            }
+        }
+        return result;
+    }, "Please enter a date in the format DD/MM/YYYY");
+jQuery.validator.addMethod("specialChar", function(value, element) {
+     return this.optional(element) || /([0-9a-zA-Z\s])$/.test(value);
+  }, "Special character not allowed.");
+
+ $.validator.addMethod("pwcheckspechars", function (value) {
         
+        return /[!@#$%^&*()_=\[\]{};':"\\|,.<>\/?+-]/.test(value)
+    }, "The password must contain at least one special character");
+    
+    $.validator.addMethod("pwcheckconsecchars", function (value) {
+        return ! (/(.)\1\1/.test(value)) // does not contain 3 consecutive identical chars
+    }, "The password must not contain 3 consecutive identical characters");
+
+    $.validator.addMethod("pwchecklowercase", function (value) {
+        return /[a-z]/.test(value) // has a lowercase letter
+    }, "The password must contain at least one lowercase letter");
+    
+    $.validator.addMethod("pwcheckrepeatnum", function (value) {
+        return /\d{2}/.test(value) // has a lowercase letter
+    }, "The password must contain at least one lowercase letter");
+    
+    $.validator.addMethod("pwcheckuppercase", function (value) {
+        return /[A-Z]/.test(value) // has an uppercase letter
+    }, "The password must contain at least one uppercase letter");
+    
+    $.validator.addMethod("pwchecknumber", function (value) {
+        return /\d/.test(value) // has a digit
+    }, "The password must contain at least one number");
+    
+
+  });
         
     </script>
 

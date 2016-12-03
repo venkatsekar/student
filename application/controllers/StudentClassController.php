@@ -1,12 +1,12 @@
 <?php
 
-class StudentClassController extends Controller {
+class StudentclassController extends Controller {
 
     function __construct($controller, $action) {
 	parent::__construct($controller, $action);
 		$this->_auth = new Authentication();
 
-		/*if (!$this->_auth->logged_in()) {
+		if (!$this->_auth->logged_in()) {
 			header('Location: '.BASEURL.'login');
 			die();
 		}
@@ -21,11 +21,15 @@ class StudentClassController extends Controller {
 		
 		$this->_view->set('sid', $this->_auth->user_id());
 		$this->_view->set('name', $this->_auth->name());
-		*/
+		
 	}
 	
 	function index() 
 	{	
+		if(!$this->_auth->hasPermission($this->_auth->role_id(), 'studentclass')) {
+			header("Location: ". BASEURL . "dashboard/?perm=0");
+		}
+
 		$this->render = 1;
 		$this->_view->set("pagename", "index");
 

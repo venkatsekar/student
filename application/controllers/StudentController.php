@@ -6,7 +6,7 @@ class StudentController extends Controller {
 	parent::__construct($controller, $action);
 		$this->_auth = new Authentication();
 
-		/*if (!$this->_auth->logged_in()) {
+		if (!$this->_auth->logged_in()) {
 			header('Location: '.BASEURL.'login');
 			die();
 		}
@@ -21,11 +21,15 @@ class StudentController extends Controller {
 		
 		$this->_view->set('sid', $this->_auth->user_id());
 		$this->_view->set('name', $this->_auth->name());
-		*/
+	
 	}
 	
 	function index() 
 	{	
+		if(!$this->_auth->hasPermission($this->_auth->role_id(), 'student')) {
+			header("Location: ". BASEURL . "dashboard/?perm=0");
+		}
+
 		$this->render = 1;
 		$this->_view->set("pagename", "index");
 
@@ -43,6 +47,10 @@ class StudentController extends Controller {
 	}
 	function add() 
 	{	
+		if(!$this->_auth->hasPermission($this->_auth->role_id(), 'student/add')) {
+			header("Location: ". BASEURL . "dashboard/?perm=0");
+		}
+
 		$this->render = 1;
 		$this->_view->set("pagename", "add");
 
@@ -58,6 +66,7 @@ class StudentController extends Controller {
 
 	function add_student()
 	{
+		print_r($_POST);
 		$this->render = 0;
 		$FirstName = $_POST['firstName'];
 		$LastName = $_POST['lastName'];
@@ -77,8 +86,8 @@ class StudentController extends Controller {
 		$City = $_POST['city'];
 		$State = $_POST['state'];
 		$FirstContact = $_POST['preference_contact'][0];
-		$SecondContact = $_POST['preference_contact'][1];
-		$ThirdContact = $_POST['preference_contact'][2];
+		$SecondContact = @$_POST['preference_contact'][1];
+		$ThirdContact = @$_POST['preference_contact'][2];
 		$Photo = @$_POST['photo'];
 		$BankAccNo = $_POST['bankAccno'];
 		$BankName = $_POST['bankName'];
@@ -94,9 +103,9 @@ class StudentController extends Controller {
 		$FirstScoreCard = $_POST['firstScoreCards'];
 		$SecScoreCard = $_POST['secondScoreCards'];
 		$ThirdScoreCard = $_POST['thirdScoreCards'];
-		$StudentSubjectId = $_POST['subjectId'];
+		$StudentSubjectId = $_POST['studentSubjectId'];
 		$Remarks = $_POST['remarks'];
-
+		//echo $StudentSubjectId;
 		$UserInfoId = @$_POST['userInfoId'];
 		$StudentInfoId = @$_POST['studentInfoId'];
 		$StudentSubjectId = @$_POST['studentSubId'];
@@ -106,13 +115,33 @@ class StudentController extends Controller {
 		}
 		else
 		{
-			$Result = $this->_model->add_new_student($FirstName, $LastName,$Email, $LoginId, $Password,$Question, $Answer, $KnowAbout,$FatherName, $FatherOccu, $MotherName, $MotherOccu, $DateOfBirth, $Address, $City, $State, $FirstContact, $SecondContact, $ThirdContact, $Photo, $BankAccNo, $BankName, $IfscCode, $BankBranch, $BrotherName, $BrotherDob, $SisterName, $SisterDob, $SchoolName, $BoardId, $ClassId, $FirstScoreCard, $SecScoreCard, $ThirdScoreCard, $StudentSubjectId, $Remarks);
+
+			$StudentInfoId = $this->_model->add_new_student($FirstName, $LastName, $Email, $LoginId, $Password, $Question, $Answer, $KnowAbout, $FatherName, $FatherOccu, $MotherName, $MotherOccu, $DateOfBirth, $Address, $City, $State, $FirstContact, $SecondContact, $ThirdContact, $Photo, $BankAccNo, $BankName, $IfscCode, $BankBranch, $BrotherName, $BrotherDob, $SisterName, $SisterDob, $SchoolName, $BoardId, $ClassId, $FirstScoreCard, $SecScoreCard, $ThirdScoreCard, $StudentSubjectId, $Remarks);
+			$Ph=$_FILES['photo']['tmp_name'];
+	  		$Photo = $_FILES['photo']['name'];
+			
+			//$ImageName = $_POST['image_name'];
+			//$ImageDesc = $_POST['image_desc'];
+			
+			if ($_FILES['photo']['name']!='') {
+	      		$Photo=$StudentInfoId.'-'.$Photo;
+	      		$path=$_SERVER['DOCUMENT_ROOT'].'/student/images/student/';
+	    		//print_r($_FILES);
+			    //echo $path;
+			    $upload = $path.$Photo;
+			    move_uploaded_file($Ph, $upload);
+	    	}
+	    	$Result = $this->_model->update_student_image($StudentInfoId, $Photo); 
 		}
 		echo $Result;
 	}
 
 	function edit($UserInfoId)
 	{
+		if(!$this->_auth->hasPermission($this->_auth->role_id(), 'student/edit')) {
+			header("Location: ". BASEURL . "dashboard/?perm=0");
+		}
+
 		$this->render = 1;
 		$UserInfoId = base64_decode($UserInfoId);
 		$EditStudent = $this->_model->edit_student($UserInfoId);

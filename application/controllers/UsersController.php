@@ -6,7 +6,7 @@ class UsersController extends Controller {
 	parent::__construct($controller, $action);
 		$this->_auth = new Authentication();
 
-		/*if (!$this->_auth->logged_in()) {
+		if (!$this->_auth->logged_in()) {
 			header('Location: '.BASEURL.'login');
 			die();
 		}
@@ -21,7 +21,7 @@ class UsersController extends Controller {
 		
 		$this->_view->set('sid', $this->_auth->user_id());
 		$this->_view->set('name', $this->_auth->name());
-		*/
+		
 	}
 	
 	function index() 

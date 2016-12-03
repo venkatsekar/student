@@ -5,7 +5,7 @@ class Student extends Model {
 	function list_board()
 	{
 		$query = "SELECT DISTINCT b.board_id, ssb.board_name FROM board b,school_boards ssb
-				  WHERE ssb.school_board_id = b.school_board_id AND b.status = 1";
+				  WHERE ssb.school_board_id = b.school_board_id AND b.status = 1 GROUP BY ssb.school_board_id";
 		return $this->db->query($query);
 	}
 	//List Class
@@ -40,7 +40,13 @@ class Student extends Model {
 
 		$totalFiltered = $totalData;  // when there is no search parameter then total number rows = total number filtered rows.
 		$sql = "SELECT ui.*,si.student_info_id,ss.student_subject_id FROM user_info ui, student_info si, student_subject ss WHERE ui.user_info_id = si.user_info_id AND si.student_info_id = ss.student_info_id AND ss.status = 1 AND si.status = 1 AND ui.status =1";		
-		
+		if( !empty($requestData['search']['value']) ) {   // if there is a search parameter, $requestData['search']['value'] contains search parameter
+			$sql.=" AND ( ui.first_name LIKE '%".$requestData['search']['value']."%' ";    
+			$sql.=" OR ui.last_name LIKE '%".$requestData['search']['value']."%' ";
+
+			$sql.=" OR ui.email_id LIKE '%".$requestData['search']['value']."%' )";
+		}
+		$totalFiltered = $this->db->row_count($sql); // when there is a search parameter then we have to modify total number filtered rows as per search result. 
 		$sql.=" ORDER BY ". $columns[$requestData['order'][0]['column']]."   ".$requestData['order'][0]['dir']."  LIMIT ".$requestData['start']." ,".$requestData['length']."   ";
 		/* $requestData['order'][0]['column'] contains colmun index, $requestData['order'][0]['dir'] contains order such as asc/desc  */	
 		//$other = array();
@@ -68,12 +74,22 @@ class Student extends Model {
 		return $json_data;		
 	}
 
-	function add_new_student($FirstName, $LastName,$Email, $LoginId, $Password,$Question, $Answer, $KnowAbout,$FatherName, $FatherOccu, $MotherName, $MotherOccu, $DateOfBirth, $Address, $City, $State, $FirstContact, $SecondContact, $ThirdContact, $Photo, $BankAccNo, $BankName, $IfscCode, $BankBranch, $BrotherName, $BrotherDob, $SisterName, $SisterDob, $SchoolName, $BoardId, $ClassId, $FirstScoreCard, $SecScoreCard, $ThirdScoreCard, $StudentSubjectId, $Remarks)
+	function add_new_student($FirstName, $LastName, $Email, $LoginId, $Password, $Question, $Answer, $KnowAbout, $FatherName, $FatherOccu, $MotherName, $MotherOccu, $DateOfBirth, $Address, $City, $State, $FirstContact, $SecondContact, $ThirdContact, $Photo, $BankAccNo, $BankName, $IfscCode, $BankBranch, $BrotherName, $BrotherDob, $SisterName, $SisterDob, $SchoolName, $BoardId, $ClassId, $FirstScoreCard, $SecScoreCard, $ThirdScoreCard, $StudentSubjectId, $Remarks)
 	{
 		date_default_timezone_set('Asia/Kolkata');
-
+		//echo $StudentSubjectId;
 		$DateTime = new DateTime();
 		$CurrentTime = $DateTime ->format('y-m-d H:i:s');
+		
+		$ConvertDOB = str_replace('/', '-', $DateOfBirth);
+		$DOB = date('Y-m-d H:i:s', strtotime($ConvertDOB));
+		
+		$ConvertSisterDOB = str_replace('/', '-', $SisterDob);
+		$SisterDOB = date('Y-m-d H:i:s', strtotime($ConvertSisterDOB));
+
+		$ConvertBrotherDOB = str_replace('/', '-', $BrotherDob);
+		$BrotherDOB = date('Y-m-d H:i:s', strtotime($ConvertBrotherDOB));
+
 		$user_info = array( 'first_name' => $FirstName,
 							'last_name' => $LastName, 
 							'email_id' => $Email,
@@ -91,12 +107,20 @@ class Student extends Model {
 						  );
 		$this->db->insert('user_info', $user_info);
 		$UserInfoId = $this->db->lastinsertid();
+		$user_role = array( 'role_id' => 4,
+							'user_info_id' => $UserInfoId, 
+							'date_added' => $CurrentTime,
+							'last_modified' => $CurrentTime,
+							'status' => 1
+						  );
+		$this->db->insert('user_role', $user_info);
+		
 		$student_info = array(  'user_info_id' => $UserInfoId,
 								'father_name' => $FatherName, 
 								'father_occupation' => $FatherOccu,
 								'mother_name' => $MotherName,
 								'mother_occupation' => $MotherOccu, 
-								'date_of_birth' => $DateOfBirth, 
+								'date_of_birth' => $DOB, 
 								'address_line1' => $Address,
 								'city' => $City, 
 								'state_id' => $State, 
@@ -108,9 +132,9 @@ class Student extends Model {
 								'ifsc_code' => $IfscCode, 
 								'bank_branch' => $BankBranch, 
 								'brother_name' => $BrotherName, 
-								'brother_dob' => $BrotherDob,
+								'brother_dob' => $BrotherDOB,
 								'sister_name' => $SisterName,
-								'sister_dob' => $SisterDob,
+								'sister_dob' => $SisterDOB,
 								'school_name' => $SchoolName,
 								'board_id' => $BoardId,
 								'class_id' => $ClassId,
@@ -123,6 +147,7 @@ class Student extends Model {
 								'last_modified' => $CurrentTime,
 								'status' => 1
 							);
+		//print_r($student_info);
 		$this->db->insert('student_info', $student_info);
 		$StudentInfoId = $this->db->lastinsertid();
 		$student_subject =  array('student_info_id' => $StudentInfoId,
@@ -131,7 +156,22 @@ class Student extends Model {
 							'last_modified' => $CurrentTime,
 							'status' => 1
 						);
-		return $this->db->insert('student_subject', $student_subject);
+		$this->db->insert('student_subject', $student_subject);
+		return $StudentInfoId;
+	}
+
+	function update_student_image($StudentInfoId, $Photo)
+	{
+		date_default_timezone_set('Asia/Kolkata');
+
+		$DateTime = new DateTime();
+		$CurrentTime = $DateTime ->format('y-m-d H:i:s');
+		$student_info = array(  'photo' => $Photo,
+								'last_modified' => $CurrentTime,
+								'status' => 1
+								);
+		$student_where = array( 'student_info_id' => $StudentInfoId);
+		return $this->db->update('student_info', $student_info, $student_where);
 	}
 
 	function edit_student($UserInfoId)
@@ -148,6 +188,15 @@ class Student extends Model {
 
 		$DateTime = new DateTime();
 		$CurrentTime = $DateTime ->format('y-m-d H:i:s');
+
+		$ConvertDOB = str_replace('/', '-', $DateOfBirth);
+		$DOB = date('Y-m-d H:i:s', strtotime($ConvertDOB));
+		
+		$ConvertSisterDOB = str_replace('/', '-', $SisterDob);
+		$SisterDOB = date('Y-m-d H:i:s', strtotime($ConvertSisterDOB));
+
+		$ConvertBrotherDOB = str_replace('/', '-', $BrotherDob);
+		$BrotherDOB = date('Y-m-d H:i:s', strtotime($ConvertBrotherDOB));
 		$user_info = array( 'first_name' => $FirstName,
 							'last_name' => $LastName, 
 							'email_id' => $Email,
@@ -170,7 +219,7 @@ class Student extends Model {
 								'father_occupation' => $FatherOccu,
 								'mother_name' => $MotherName,
 								'mother_occupation' => $MotherOccu, 
-								'date_of_birth' => $DateOfBirth, 
+								'date_of_birth' => $DOB, 
 								'address_line1' => $Address,
 								'city' => $City, 
 								'state_id' => $State, 
@@ -182,9 +231,9 @@ class Student extends Model {
 								'ifsc_code' => $IfscCode, 
 								'bank_branch' => $BankBranch, 
 								'brother_name' => $BrotherName, 
-								'brother_dob' => $BrotherDob,
+								'brother_dob' => $BrotherDOB,
 								'sister_name' => $SisterName,
-								'sister_dob' => $SisterDob,
+								'sister_dob' => $SisterDOB,
 								'school_name' => $SchoolName,
 								'board_id' => $BoardId,
 								'class_id' => $ClassId,
